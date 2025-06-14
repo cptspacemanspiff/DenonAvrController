@@ -82,7 +82,7 @@ private struct VolumeSliderView: View {
     @ObservedObject var receiverModel: ReceiverStateModel
     @Environment(\.openWindow) private var openWindow
     @State private var isSettingsHovered: Bool = false
-
+    @State private var isQuitHovered: Bool = false
     var body: some View {
         VStack(spacing: 0) {
             if let snapshot = receiverModel.lastPolledState {
@@ -167,6 +167,22 @@ private struct VolumeSliderView: View {
                 .buttonStyle(IconButtonStyle(background: .clear, foreground: .secondary))
                 .onHover { hovering in
                     isSettingsHovered = hovering
+                }
+                
+                
+                Button(action: { NSApp.terminate(nil) }) {
+                    Text("Quit")
+                        .help("Quit the app")
+                }
+                .buttonStyle(
+                    IconButtonStyle(
+                        background: .clear,
+                        foreground: isQuitHovered ? .red : .secondary)
+                )
+                .scaleEffect(isQuitHovered ? 1.2 : 1.0)
+                .animation(.easeInOut(duration: 0.15), value: isQuitHovered)
+                .onHover { hovering in
+                    isQuitHovered = hovering
                 }
             }
             .padding(.horizontal, 12)
