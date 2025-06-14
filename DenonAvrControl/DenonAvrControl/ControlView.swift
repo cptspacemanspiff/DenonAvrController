@@ -103,10 +103,10 @@ private struct VolumeSliderView: View {
                         set: { newValue in receiverModel.setPower(to: newValue) }
                     )) {
                         Image(systemName: "power")
-                            .foregroundStyle(snapshot.isOn ? .green : .red)
+                            .foregroundColor(.accentColor)
                             .help(snapshot.isOn ? "Power Off" : "Power On")
                     }
-                    .toggleStyle(.switch).tint(.green)
+                    .toggleStyle(.switch).tint(.accentColor)
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)
@@ -119,14 +119,14 @@ private struct VolumeSliderView: View {
                         .frame(width: 210, alignment: .leading)
                     Spacer()
                     Toggle(isOn: Binding(
-                        get: { snapshot.isMuted },
-                        set: { newValue in receiverModel.setMute(to: newValue) }
+                        get: { !snapshot.isMuted },
+                        set: { newValue in receiverModel.setMute(to: !newValue) }
                     )) {
                         Image(systemName: snapshot.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                            .foregroundStyle(snapshot.isMuted ? .red : .primary)
+                            .foregroundColor(.accentColor)
                     }
-                    .toggleStyle(.switch).tint(.red)
-                    .help(snapshot.isMuted ? "Unmute" : "Mute")
+                    .toggleStyle(.switch).tint(.accentColor)
+                    .help(snapshot.isMuted ? "Mute" : "Unmute")
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)
@@ -177,7 +177,7 @@ private struct VolumeSliderView: View {
                 .buttonStyle(
                     IconButtonStyle(
                         background: .clear,
-                        foreground: isQuitHovered ? .red : .secondary)
+                        foreground: isQuitHovered ? .accentColor : .secondary)
                 )
                 .scaleEffect(isQuitHovered ? 1.2 : 1.0)
                 .animation(.easeInOut(duration: 0.15), value: isQuitHovered)
