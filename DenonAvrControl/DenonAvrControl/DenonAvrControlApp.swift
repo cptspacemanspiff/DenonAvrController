@@ -14,12 +14,17 @@ struct DenonAvrControlApp: App {
     @State private var testResult: TestResult = TestResult(success: nil, message: nil)
     @State private var isTestingConnection: Bool = false
 
+    @State private var didPollOnLaunch = false
     var body: some Scene {
         MenuBarExtra("🔊 Volume", systemImage: "speaker.wave.2") {
             ControlView(receiverModel: receiverModel)
                 .frame(width: 300)
                 .onAppear {
                     receiverModel.startPolling()
+                    if !didPollOnLaunch {
+                        receiverModel.performImmediatePoll()
+                        didPollOnLaunch = true
+                    }
                 }
                 .onDisappear {
                     receiverModel.stopPolling()

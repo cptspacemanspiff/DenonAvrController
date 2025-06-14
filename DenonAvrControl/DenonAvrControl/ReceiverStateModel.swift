@@ -3,7 +3,6 @@ import Combine
 import SystemConfiguration
 import CoreFoundation
 
-import Network
 import SWXMLHash
 
 struct ReceiverStateSnapshot {
@@ -61,11 +60,14 @@ class ReceiverStateModel: ObservableObject {
     @Published var isConnected: Bool = false
     @Published var errorMessage: String? = nil
 
+    /// Public method to trigger an immediate poll
+    func performImmediatePoll() {
+        pollReceiver()
+    }
+
     private var ipAddress: String
     private var pollingInterval: TimeInterval
     private var pollingTimer: Timer?
-    private var networkMonitor: NWPathMonitor?
-    private var lastNetworkPath: NWPath?
     private var isPollingActive = false
     private var consecutiveFailures = 0
     private let maxFailures = 3
@@ -82,54 +84,17 @@ class ReceiverStateModel: ObservableObject {
 
     func startPolling() {
         stopPolling()
-        startNetworkMonitoring()
-    }
-
-    private func startNetworkMonitoring() {
-        if networkMonitor != nil { return }
-        let monitor = NWPathMonitor()
-        self.networkMonitor = monitor
-        let queue = DispatchQueue(label: "NetworkMonitor")
-        monitor.pathUpdateHandler = { [weak self] path in
-            guard let self = self else { return }
-            if self.lastNetworkPath == nil || self.lastNetworkPath != path {
-                self.lastNetworkPath = path
-                self.handleNetworkChange()
-            }
-        }
-        monitor.start(queue: queue)
-        // Initial check
-        handleNetworkChange()
-    }
-
-    private func handleNetworkChange() {
-        stopPolling()
-        isPollingActive = false
-        // Validate the configured receiver IP once
-        validateConnection(ip: ipAddress) { [weak self] success, _ in
-            DispatchQueue.main.async {
-                if success {
-                    self?.beginPolling()
-                } else {
-                    self?.isConnected = false
-                    self?.errorMessage = "Receiver not found on current network"
-                }
-            }
-        }
+        beginPolling() // Always restart polling timer when startPolling is called
     }
 
     private func beginPolling() {
         stopPolling() // Prevent multiple timers!
+        guard !isPollingActive else { return }
         isPollingActive = true
-        pollingTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+        pollingTimer = Timer.scheduledTimer(withTimeInterval: pollingInterval, repeats: true) { [weak self] _ in
             self?.pollReceiver()
         }
-        // No immediate pollReceiver() call (already fixed)
-    }
-    
-    @objc private func updateNetworkStatus() {
-        // This will be called when network status changes
-        // No action needed; handled by NWPathMonitor now.
+        pollReceiver()
     }
 
     func stopPolling() {
@@ -138,13 +103,6 @@ class ReceiverStateModel: ObservableObject {
         isPollingActive = false
     }
 
-    deinit {
-        networkMonitor?.cancel()
-    }
-
-    // checkNetworkAndPoll is now obsolete (network change triggers validation and polling)
-
-    
     private func pollReceiver() {
         guard !ipAddress.isEmpty else {
             print("[Polling] Skipped: IP address is empty.")

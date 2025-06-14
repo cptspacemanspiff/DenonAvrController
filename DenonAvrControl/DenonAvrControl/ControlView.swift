@@ -54,7 +54,9 @@ private struct VolumeSliderView: View {
 
     var body: some View {
         HStack {
-            Text("Vol")
+            Text("Volume:")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             Slider(
                 value: $sliderValue,
                 in: -80.5...18.0,
@@ -82,7 +84,6 @@ private struct VolumeSliderView: View {
                 HStack(alignment: .center) {
                     Text("Input:").padding(.leading, 12)
                         .font(.subheadline)
-                        .fontWeight(.semibold)
                         .foregroundStyle(.secondary)
                     Text(snapshot.input)
                         .font(.subheadline)
