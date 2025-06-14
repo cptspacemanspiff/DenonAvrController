@@ -9,6 +9,34 @@ import SwiftUI
 
 import SwiftUI
 
+struct IconButtonStyle: ButtonStyle {
+    var background: Color = .accentColor
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(width: 32, height: 32)
+            .background(background.opacity(configuration.isPressed ? 0.7 : 1.0))
+            .foregroundColor(.white)
+            .clipShape(Circle())
+            .shadow(color: .black.opacity(0.15), radius: configuration.isPressed ? 1 : 3, x: 0, y: configuration.isPressed ? 0 : 2)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+    }
+}
+
+struct ModernButtonStyle: ButtonStyle {
+    var background: Color = Color.accentColor
+    var foreground: Color = Color.white
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+            .background(background.opacity(configuration.isPressed ? 0.7 : 1.0))
+            .foregroundColor(foreground)
+            .cornerRadius(8)
+            .shadow(color: .black.opacity(0.15), radius: configuration.isPressed ? 1 : 3, x: 0, y: configuration.isPressed ? 0 : 2)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+    }
+}
+
 struct ControlView: View {
     // ...
 
@@ -51,8 +79,16 @@ private struct VolumeSliderView: View {
     var body: some View {
         VStack(spacing: 0) {
             if let snapshot = receiverModel.lastPolledState {
-                HStack {
-                    Text("Volume: \(String(format: "%.1f", snapshot.volume))")
+                HStack(alignment: .center) {
+                    Text("Input:").padding(.leading, 12)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                    Text(snapshot.input)
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
+                        .fontWeight(.semibold)
+                        .lineLimit(1)
                     Spacer()
                     Button(action: {
                         receiverModel.setPower(to: !snapshot.isOn)
@@ -61,36 +97,26 @@ private struct VolumeSliderView: View {
                             .foregroundStyle(snapshot.isOn ? .green : .red)
                             .help(snapshot.isOn ? "Power Off" : "Power On")
                     }
+                    .buttonStyle(IconButtonStyle(background: .gray))
                 }
-                .padding(.top, 6)
+                .padding(.vertical, 4)
+                .padding(.trailing, 4)
 
                 Divider()
 
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Input: ")
-                        Text(snapshot.input)
-                        Spacer()
+                HStack(alignment: .center, spacing: 12) {
+                    VolumeSliderView(snapshot: snapshot, receiverModel: receiverModel)
+                    Button(action: {
+                        receiverModel.setMute(to: !snapshot.isMuted)
+                    }) {
+                        Image(systemName: snapshot.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                            .foregroundStyle(snapshot.isMuted ? .red : .primary)
                     }
-                    .padding(.vertical, 4)
-
-                    HStack {
-                        Text("Vol")
-                        // Use @State for slider value
-                        VolumeSliderView(snapshot: snapshot, receiverModel: receiverModel)
-
-                        Button(action: {
-                            receiverModel.setMute(to: !snapshot.isMuted)
-                        }) {
-                            Image(systemName: snapshot.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                                .foregroundStyle(snapshot.isMuted ? .red : .primary)
-                        }
-                        .help(snapshot.isMuted ? "Unmute" : "Mute")
-                    }
+                    .buttonStyle(IconButtonStyle(background: snapshot.isMuted ? .red : .blue))
+                    .help(snapshot.isMuted ? "Unmute" : "Mute")
                 }
+                .padding(.top, 16)
 
-                Text("Last updated: \(snapshot.lastUpdated.formatted(.dateTime.hour().minute().second()))")
-                    .font(.footnote)
             } else {
                 VStack {
                     ProgressView()
@@ -110,49 +136,41 @@ private struct VolumeSliderView: View {
 
             Spacer()
             HStack {
+                if let snapshot = receiverModel.lastPolledState {
+                    Text("Last updated: \(snapshot.lastUpdated.formatted(.dateTime.hour().minute().second()))")
+                        .font(.footnote).padding(.leading, 12)
+                }
                 Spacer()
                 Button(action: { openWindow(id: "settings") }) {
                     Image(systemName: "gearshape")
                         .imageScale(.large)
-                        .padding(.trailing, 6)
-                        .padding(.bottom, 4)
+                        .padding(.trailing, 0)
+                        .padding(.bottom, 0)
                         .help("Settings")
                 }
+                .buttonStyle(IconButtonStyle(background: .gray))
+                .padding(.trailing, 12)
+                .padding(.bottom, 4)
             }
-            .padding(.top, 10)
+            .padding(.horizontal, 0)
+            .padding(.bottom, 4)
         }
         .frame(width: 300)
     }
 }
 
-
-struct VolumeView: View {
-    @Binding var ipAddress: String
-    @State private var volume: Double = 0.5
-    @State private var status: String = ""
-
-    var body: some View {
-        VStack(spacing: 10) {
-            Text("Radio Volume")
-            Slider(value: $volume)
-                .frame(width: 150)
-            Button("Set Volume") {
-                setVolume()
-            }
-            if !status.isEmpty {
-                Text(status)
-                    .font(.footnote)
-            }
-        }
-        .padding()
+struct ControlView_Previews: PreviewProvider {
+    static var previews: some View {
+        let mockSnapshot = ReceiverStateSnapshot(
+            isOn: true,
+            volume: -40.0,
+            isMuted: false,
+            input: "CD",
+            lastUpdated: Date()
+        )
+        let mockModel = ReceiverStateModel(ipAddress: "0.0.0.0")
+        mockModel.lastPolledState = mockSnapshot
+        return ControlView(receiverModel: mockModel)
     }
-    
-    func setVolume() {
-        status = "Set volume to \(volume) for IP: \(ipAddress)"
-    }
-}
-
-#Preview {
-    VolumeView(ipAddress: .constant("192.168.1.100"))
 }
 
