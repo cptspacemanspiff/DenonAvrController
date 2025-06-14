@@ -4,21 +4,66 @@ import SystemConfiguration
 import CoreFoundation
 
 import Network
+import SWXMLHash
+
+struct ReceiverStateSnapshot {
+    let isOn: Bool
+    let volume: Float
+    let isMuted: Bool
+    let input: String
+    let lastUpdated: Date
+}
 
 class ReceiverStateModel: ObservableObject {
+    // --- Command sending methods ---
+    /// Set the volume in dB (range: -80.5 to 18.0)
+    func setVolume(to dB: Float) {
+        let dBString = String(format: "%.1f", dB)
+        print("[DenonAvr] setVolume(to:) called with dB = \(dBString)")
+        sendPostCommand(cmd: "PutMasterVolumeSet/\(dBString)")
+    }
+
+    /// Set mute state
+    func setMute(to muted: Bool) {
+        let state = muted ? "on" : "off"
+        print("[DenonAvr] setMute(to:) called with muted = \(muted) (\(state))")
+        sendPostCommand(cmd: "PutVolumeMute/\(state)")
+    }
+
+    /// Set power state
+    func setPower(to on: Bool) {
+        let state = on ? "ON" : "OFF"
+        print("[DenonAvr] setPower(to:) called with on = \(on) (\(state))")
+        sendPostCommand(cmd: "PutZone_OnOff/\(state)")
+    }
+
+    /// Send a POST command to the receiver
+    private func sendPostCommand(cmd: String) {
+        print("[DenonAvr] sendPostCommand: \(cmd) to http://\(ipAddress)/MainZone/index.put.asp")
+        guard !ipAddress.isEmpty else { return }
+        let urlString = "http://\(ipAddress)/MainZone/index.put.asp"
+        guard let url = URL(string: urlString) else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        let body = "cmd0=\(cmd)"
+        request.httpBody = body.data(using: .utf8)
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        let task = URLSession.shared.dataTask(with: request) { [weak self] _, _, _ in
+            // After sending, poll for latest state
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self?.pollReceiver()
+            }
+        }
+        task.resume()
+    }
     // Published properties for UI binding
-    @Published var isOn: Bool = false
-    @Published var volume: Float = 0.0
-    @Published var isMuted: Bool = false
-    @Published var input: String = ""
+    @Published var lastPolledState: ReceiverStateSnapshot? = nil
     @Published var isConnected: Bool = false
-    @Published var lastUpdated: Date? = nil
     @Published var errorMessage: String? = nil
 
     private var ipAddress: String
     private var pollingInterval: TimeInterval
     private var pollingTimer: Timer?
-    private var cancellables = Set<AnyCancellable>()
     private var networkMonitor: NWPathMonitor?
     private var lastNetworkPath: NWPath?
     private var isPollingActive = false
@@ -208,14 +253,35 @@ class ReceiverStateModel: ObservableObject {
     }
 
     private func parseReceiverXML(_ data: Data) {
-        // TODO: Implement real XML parsing for receiver state
-        // For now, just mark as updated
+        let xml = XMLHash.config {
+              config in
+              // set any config options here
+          }.parse(data)
+        let now = Date()
+
+        let powerString = xml["item"]["Power"]["value"].element?.text ?? ""
+        let isOn = powerString.uppercased() == "ON"
+
+        let volumeString = xml["item"]["MasterVolume"]["value"].element?.text ?? "0.0"
+        let volume = Float(volumeString) ?? 0.0
+
+        let muteString = xml["item"]["Mute"]["value"].element?.text ?? ""
+        let isMuted = muteString.lowercased() == "on"
+
+        let input = xml["item"]["InputFuncSelect"]["value"].element?.text ?? ""
+
+        let snapshot = ReceiverStateSnapshot(
+            isOn: isOn,
+            volume: volume,
+            isMuted: isMuted,
+            input: input,
+            lastUpdated: now
+        )
+
         DispatchQueue.main.async {
-            self.lastUpdated = Date()
+            self.lastPolledState = snapshot
             self.errorMessage = nil
-            // Example: self.volume = ...
-            // Example: self.powerOn = ...
-            // Example: self.inputSource = ...
+            print("[Polling] Snapshot: isOn=\(snapshot.isOn), volume=\(snapshot.volume), isMuted=\(snapshot.isMuted), input=\(snapshot.input), lastUpdated=\(snapshot.lastUpdated)")
         }
     }
 

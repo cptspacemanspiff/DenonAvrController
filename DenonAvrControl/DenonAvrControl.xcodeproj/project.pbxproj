@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B232ABFF2DFDFA7500C4438E /* SWXMLHash in Frameworks */ = {isa = PBXBuildFile; productRef = B232ABFE2DFDFA7500C4438E /* SWXMLHash */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		B2244D132DFDD5B300C96A5E /* DenonAvrControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DenonAvrControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B232ABFF2DFDFA7500C4438E /* SWXMLHash in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +51,7 @@
 			isa = PBXGroup;
 			children = (
 				B2244D152DFDD5B300C96A5E /* DenonAvrControl */,
+				B232ABFC2DFDFA3C00C4438E /* Frameworks */,
 				B2244D142DFDD5B300C96A5E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +62,13 @@
 				B2244D132DFDD5B300C96A5E /* DenonAvrControl.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B232ABFC2DFDFA3C00C4438E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -78,6 +91,7 @@
 			);
 			name = DenonAvrControl;
 			packageProductDependencies = (
+				B232ABFE2DFDFA7500C4438E /* SWXMLHash */,
 			);
 			productName = DenonAvrControl;
 			productReference = B2244D132DFDD5B300C96A5E /* DenonAvrControl.app */;
@@ -107,6 +121,9 @@
 			);
 			mainGroup = B2244D0A2DFDD5B300C96A5E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B232ABFD2DFDFA7500C4438E /* XCRemoteSwiftPackageReference "SWXMLHash" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B2244D142DFDD5B300C96A5E /* Products */;
 			projectDirPath = "";
@@ -344,6 +361,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B232ABFD2DFDFA7500C4438E /* XCRemoteSwiftPackageReference "SWXMLHash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/drmohundro/SWXMLHash.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B232ABFE2DFDFA7500C4438E /* SWXMLHash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B232ABFD2DFDFA7500C4438E /* XCRemoteSwiftPackageReference "SWXMLHash" */;
+			productName = SWXMLHash;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B2244D0B2DFDD5B300C96A5E /* Project object */;
 }

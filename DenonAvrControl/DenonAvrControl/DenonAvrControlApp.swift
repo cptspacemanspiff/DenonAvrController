@@ -21,6 +21,9 @@ struct DenonAvrControlApp: App {
                 .onAppear {
                     receiverModel.startPolling()
                 }
+                .onDisappear {
+                    receiverModel.stopPolling()
+                }
         }
         .menuBarExtraStyle(.window)
 
