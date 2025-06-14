@@ -69,7 +69,7 @@ private struct VolumeSliderView: View {
                     }
                 }
             )
-            .frame(width: 100)
+            .frame(width: 105)
             Text("\(String(format: "%.1f dB", sliderValue))")
                 .font(.footnote)
         }
@@ -96,7 +96,7 @@ private struct VolumeSliderView: View {
                             .foregroundStyle(.primary)
                             .lineLimit(1)
                     }
-                    .frame(width: 170, alignment: .leading)
+                    .frame(width: 180, alignment: .leading)
                     Spacer()
                     Toggle(isOn: Binding(
                         get: { snapshot.isOn },
@@ -106,7 +106,7 @@ private struct VolumeSliderView: View {
                             .foregroundStyle(snapshot.isOn ? .green : .red)
                             .help(snapshot.isOn ? "Power Off" : "Power On")
                     }
-                    .toggleStyle(.switch)
+                    .toggleStyle(.switch).tint(.green)
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)
@@ -116,7 +116,7 @@ private struct VolumeSliderView: View {
 
                 HStack(alignment: .center, spacing: 0) {
                     VolumeSliderView(snapshot: snapshot, receiverModel: receiverModel)
-                        .frame(width: 170, alignment: .leading)
+                        .frame(width: 210, alignment: .leading)
                     Spacer()
                     Toggle(isOn: Binding(
                         get: { snapshot.isMuted },
@@ -125,7 +125,7 @@ private struct VolumeSliderView: View {
                         Image(systemName: snapshot.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
                             .foregroundStyle(snapshot.isMuted ? .red : .primary)
                     }
-                    .toggleStyle(.switch)
+                    .toggleStyle(.switch).tint(.red)
                     .help(snapshot.isMuted ? "Unmute" : "Mute")
                 }
                 .padding(.vertical, 8)
@@ -172,14 +172,14 @@ private struct VolumeSliderView: View {
             .padding(.horizontal, 12)
             .padding(.bottom, 12)
         }
-        .frame(width: 300)
+        .frame(width: 320)
     }
 }
 
 struct ControlView_Previews: PreviewProvider {
     static var previews: some View {
         let mockSnapshot = ReceiverStateSnapshot(
-            isOn: false,
+            isOn: true,
             volume: -40.0,
             isMuted: true,
             input: "CD",

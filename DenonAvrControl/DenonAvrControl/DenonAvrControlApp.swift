@@ -18,7 +18,7 @@ struct DenonAvrControlApp: App {
     var body: some Scene {
         MenuBarExtra("🔊 Volume", systemImage: "speaker.wave.2") {
             ControlView(receiverModel: receiverModel)
-                .frame(width: 300)
+                .frame(width: 320)
                 .onAppear {
                     receiverModel.startPolling()
                     if !didPollOnLaunch {
