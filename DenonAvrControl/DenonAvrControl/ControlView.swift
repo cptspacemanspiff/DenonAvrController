@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct IconButtonStyle: ButtonStyle {
     var background: Color = .accentColor
     var foreground: Color = .white
@@ -18,7 +16,10 @@ struct IconButtonStyle: ButtonStyle {
             .background(background.opacity(configuration.isPressed ? 0.7 : 1.0))
             .foregroundColor(foreground)
             .clipShape(Circle())
-            .shadow(color: .black.opacity(0.15), radius: configuration.isPressed ? 1 : 3, x: 0, y: configuration.isPressed ? 0 : 2)
+            .shadow(
+                color: .black.opacity(0.15), radius: configuration.isPressed ? 1 : 3, x: 0,
+                y: configuration.isPressed ? 0 : 2
+            )
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
     }
 }
@@ -33,7 +34,10 @@ struct ModernButtonStyle: ButtonStyle {
             .background(background.opacity(configuration.isPressed ? 0.7 : 1.0))
             .foregroundColor(foreground)
             .cornerRadius(8)
-            .shadow(color: .black.opacity(0.15), radius: configuration.isPressed ? 1 : 3, x: 0, y: configuration.isPressed ? 0 : 2)
+            .shadow(
+                color: .black.opacity(0.15), radius: configuration.isPressed ? 1 : 3, x: 0,
+                y: configuration.isPressed ? 0 : 2
+            )
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
     }
 }
@@ -41,43 +45,48 @@ struct ModernButtonStyle: ButtonStyle {
 struct ControlView: View {
     // ...
 
+    private struct VolumeSliderView: View {
+        let snapshot: ReceiverStateSnapshot
+        let receiverModel: ReceiverStateModel
+        @State private var sliderValue: Double = 0.0
+        @State private var isEditing: Bool = false
 
-private struct VolumeSliderView: View {
-    let snapshot: ReceiverStateSnapshot
-    let receiverModel: ReceiverStateModel
-    @State private var sliderValue: Double = 0.0
-    @State private var isEditing: Bool = false
-
-    var body: some View {
-        HStack {
-            Text("Volume:")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Slider(
-                value: $sliderValue,
-                in: -80.5...18.0,
-                step: 1.0,
-                onEditingChanged: { editing in
-                    isEditing = editing
-                    if !editing {
-                        receiverModel.setVolume(to: Float(sliderValue))
+        var body: some View {
+            HStack {
+                Text("Volume:")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Slider(
+                    value: Binding(
+                        get: { sliderValue },
+                        set: { newValue in
+                            let snapped = (newValue * 2).rounded() / 2  // Snap to nearest 0.5
+                            sliderValue = snapped
+                        }
+                    ),
+                    in: -80.5...18.0,
+                    onEditingChanged: { editing in
+                        isEditing = editing
+                        if !editing {
+                            receiverModel.setVolume(to: Float(sliderValue))
+                        }
                     }
+                )
+                .frame(width: 105)
+                .tint(.accentColor)
+                Text("\(String(format: "%.1f dB", sliderValue))")
+                    .font(.footnote)
+            }
+            .onAppear {
+                sliderValue = Double(snapshot.volume)
+            }
+            .onChange(of: snapshot.volume) { newVolume in
+                if !isEditing {
+                    sliderValue = Double(newVolume)
                 }
-            )
-            .frame(width: 105)
-            Text("\(String(format: "%.1f dB", sliderValue))")
-                .font(.footnote)
-        }
-        .onAppear {
-            sliderValue = Double(snapshot.volume)
-        }
-        .onChange(of: snapshot.volume) { newVolume in
-            if !isEditing {
-                sliderValue = Double(newVolume)
             }
         }
     }
-}
 
     @ObservedObject var receiverModel: ReceiverStateModel
     @Environment(\.openWindow) private var openWindow
@@ -98,10 +107,12 @@ private struct VolumeSliderView: View {
                     }
                     .frame(width: 180, alignment: .leading)
                     Spacer()
-                    Toggle(isOn: Binding(
-                        get: { snapshot.isOn },
-                        set: { newValue in receiverModel.setPower(to: newValue) }
-                    )) {
+                    Toggle(
+                        isOn: Binding(
+                            get: { snapshot.isOn },
+                            set: { newValue in receiverModel.setPower(to: newValue) }
+                        )
+                    ) {
                         Image(systemName: "power")
                             .foregroundColor(.secondary)
                             .help(snapshot.isOn ? "Power Off" : "Power On")
@@ -118,12 +129,17 @@ private struct VolumeSliderView: View {
                     VolumeSliderView(snapshot: snapshot, receiverModel: receiverModel)
                         .frame(width: 210, alignment: .leading)
                     Spacer()
-                    Toggle(isOn: Binding(
-                        get: { !snapshot.isMuted },
-                        set: { newValue in receiverModel.setMute(to: !newValue) }
-                    )) {
-                        Image(systemName: snapshot.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                            .foregroundColor(.secondary)
+                    Toggle(
+                        isOn: Binding(
+                            get: { !snapshot.isMuted },
+                            set: { newValue in receiverModel.setMute(to: !newValue) }
+                        )
+                    ) {
+                        Image(
+                            systemName: snapshot.isMuted
+                                ? "speaker.slash.fill" : "speaker.wave.2.fill"
+                        )
+                        .foregroundColor(.secondary)
                     }
                     .toggleStyle(.switch).tint(.accentColor)
                     .help(snapshot.isMuted ? "Mute" : "Unmute")
@@ -136,9 +152,12 @@ private struct VolumeSliderView: View {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
                         .padding(.top, 20)
-                    Text(receiverModel.isConnected ? "Loading receiver state..." : "Not connected to receiver.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                    Text(
+                        receiverModel.isConnected
+                            ? "Loading receiver state..." : "Not connected to receiver."
+                    )
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
                 }
             }
 
@@ -151,9 +170,11 @@ private struct VolumeSliderView: View {
             Spacer(minLength: 0)
             HStack(alignment: .center) {
                 if let snapshot = receiverModel.lastPolledState {
-                    Text("Last updated: \(snapshot.lastUpdated.formatted(.dateTime.hour().minute().second()))")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                    Text(
+                        "Last updated: \(snapshot.lastUpdated.formatted(.dateTime.hour().minute().second()))"
+                    )
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
                 }
                 Spacer()
                 Button(action: { openWindow(id: "settings") }) {
@@ -168,8 +189,7 @@ private struct VolumeSliderView: View {
                 .onHover { hovering in
                     isSettingsHovered = hovering
                 }
-                
-                
+
                 Button(action: { NSApp.terminate(nil) }) {
                     Text("Quit")
                         .help("Quit the app")
@@ -206,4 +226,3 @@ struct ControlView_Previews: PreviewProvider {
         return ControlView(receiverModel: mockModel)
     }
 }
-
