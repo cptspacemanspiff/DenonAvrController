@@ -73,7 +73,6 @@ struct ControlView: View {
                     }
                 )
                 .frame(width: 105)
-                .tint(.accentColor)
                 Text("\(String(format: "%.1f dB", sliderValue))")
                     .font(.footnote)
             }
