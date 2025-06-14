@@ -103,7 +103,7 @@ private struct VolumeSliderView: View {
                         set: { newValue in receiverModel.setPower(to: newValue) }
                     )) {
                         Image(systemName: "power")
-                            .foregroundColor(.accentColor)
+                            .foregroundColor(.secondary)
                             .help(snapshot.isOn ? "Power Off" : "Power On")
                     }
                     .toggleStyle(.switch).tint(.accentColor)
@@ -123,7 +123,7 @@ private struct VolumeSliderView: View {
                         set: { newValue in receiverModel.setMute(to: !newValue) }
                     )) {
                         Image(systemName: snapshot.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                            .foregroundColor(.accentColor)
+                            .foregroundColor(.secondary)
                     }
                     .toggleStyle(.switch).tint(.accentColor)
                     .help(snapshot.isMuted ? "Mute" : "Unmute")
