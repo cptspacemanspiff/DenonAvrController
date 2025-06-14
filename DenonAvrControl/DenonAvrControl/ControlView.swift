@@ -11,11 +11,12 @@ import SwiftUI
 
 struct IconButtonStyle: ButtonStyle {
     var background: Color = .accentColor
+    var foreground: Color = .white
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .frame(width: 32, height: 32)
             .background(background.opacity(configuration.isPressed ? 0.7 : 1.0))
-            .foregroundColor(.white)
+            .foregroundColor(foreground)
             .clipShape(Circle())
             .shadow(color: .black.opacity(0.15), radius: configuration.isPressed ? 1 : 3, x: 0, y: configuration.isPressed ? 0 : 2)
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
@@ -80,6 +81,7 @@ private struct VolumeSliderView: View {
 
     @ObservedObject var receiverModel: ReceiverStateModel
     @Environment(\.openWindow) private var openWindow
+    @State private var isSettingsHovered: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -157,24 +159,29 @@ private struct VolumeSliderView: View {
                 Button(action: { openWindow(id: "settings") }) {
                     Image(systemName: "gearshape")
                         .imageScale(.large)
+                        .foregroundColor(isSettingsHovered ? .accentColor : .secondary)
                         .help("Settings")
+                        .scaleEffect(isSettingsHovered ? 1.2 : 1.0)
+                        .animation(.easeInOut(duration: 0.15), value: isSettingsHovered)
                 }
-                .buttonStyle(IconButtonStyle(background: .gray))
+                .buttonStyle(IconButtonStyle(background: .clear, foreground: .secondary))
+                .onHover { hovering in
+                    isSettingsHovered = hovering
+                }
             }
             .padding(.horizontal, 12)
-            .padding(.bottom, 8)
+            .padding(.bottom, 12)
         }
         .frame(width: 300)
-        .padding(.vertical, 8)
     }
 }
 
 struct ControlView_Previews: PreviewProvider {
     static var previews: some View {
         let mockSnapshot = ReceiverStateSnapshot(
-            isOn: true,
+            isOn: false,
             volume: -40.0,
-            isMuted: false,
+            isMuted: true,
             input: "CD",
             lastUpdated: Date()
         )
