@@ -45,13 +45,8 @@ struct ControlView: View {
 private struct VolumeSliderView: View {
     let snapshot: ReceiverStateSnapshot
     let receiverModel: ReceiverStateModel
-    @State private var sliderValue: Double
-    
-    init(snapshot: ReceiverStateSnapshot, receiverModel: ReceiverStateModel) {
-        self.snapshot = snapshot
-        self.receiverModel = receiverModel
-        _sliderValue = State(initialValue: Double(snapshot.volume))
-    }
+    @State private var sliderValue: Double = 0.0
+    @State private var isEditing: Bool = false
 
     var body: some View {
         HStack {
@@ -63,8 +58,8 @@ private struct VolumeSliderView: View {
                 in: -80.5...18.0,
                 step: 1.0,
                 onEditingChanged: { editing in
+                    isEditing = editing
                     if !editing {
-                        print("[DenonAvr] VolumeSliderView: User released slider at \(sliderValue) dB")
                         receiverModel.setVolume(to: Float(sliderValue))
                     }
                 }
@@ -73,8 +68,13 @@ private struct VolumeSliderView: View {
             Text("\(String(format: "%.1f dB", sliderValue))")
                 .font(.footnote)
         }
+        .onAppear {
+            sliderValue = Double(snapshot.volume)
+        }
         .onChange(of: snapshot.volume) { newVolume in
-            sliderValue = Double(newVolume)
+            if !isEditing {
+                sliderValue = Double(newVolume)
+            }
         }
     }
 }
