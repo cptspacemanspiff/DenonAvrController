@@ -1,0 +1,50 @@
+//
+//  DenonAvrControlApp.swift
+//  DenonAvrControl
+//
+//  Created by Nicholas Long on 6/14/25.
+//
+
+import SwiftUI
+
+@main
+struct DenonAvrControlApp: App {
+    @StateObject private var receiverModel = ReceiverStateModel(ipAddress: UserDefaults.standard.string(forKey: "ReceiverIP") ?? "")
+    @State private var ipAddress: String = UserDefaults.standard.string(forKey: "ReceiverIP") ?? ""
+    @State private var testResult: TestResult = TestResult(success: nil, message: nil)
+    @State private var isTestingConnection: Bool = false
+
+    var body: some Scene {
+        MenuBarExtra("🔊 Volume", systemImage: "speaker.wave.2") {
+            ControlView(receiverModel: receiverModel)
+                .frame(width: 220)
+                .onAppear {
+                    receiverModel.startPolling()
+                }
+        }
+        .menuBarExtraStyle(.window)
+
+        Window("Settings", id: "settings") {
+            SettingsView(
+                ipAddress: $ipAddress,
+
+                onSave: {
+                    UserDefaults.standard.set(ipAddress, forKey: "ReceiverIP")
+                    receiverModel.updateIPAddress(ipAddress)
+                    receiverModel.startPolling()
+                },
+                onTest: { testIP in
+                    isTestingConnection = true
+                    receiverModel.validateConnection(ip: testIP) { success, message in
+                        DispatchQueue.main.async {
+                            testResult = TestResult(success: success, message: message)
+                            isTestingConnection = false
+                        }
+                    }
+                },
+                testResult: testResult,
+                isTesting: isTestingConnection
+            )
+        }
+    }
+}
