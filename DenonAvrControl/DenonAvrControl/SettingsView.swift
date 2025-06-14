@@ -26,8 +26,17 @@ struct SettingsView: View {
             // Receiver Settings
             Text("Receiver IP Address")
                 .font(.headline)
-            TextField("Enter IP Address", text: $ipAddress)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+            HStack {
+                TextField("Enter IP Address", text: $ipAddress)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                Button("Open") {
+                    if let url = URL(string: "http://\(ipAddress)"), !ipAddress.isEmpty {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+                .help("Open the receiver's web interface in your browser")
+            }
+
             
             if let error = errorMessage {
                 Text("Error: \(error)")
