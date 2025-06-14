@@ -55,13 +55,12 @@ private struct VolumeSliderView: View {
                     Text("Volume: \(String(format: "%.1f", snapshot.volume))")
                     Spacer()
                     Button(action: {
-                        receiverModel.setPower(to: false)
+                        receiverModel.setPower(to: !snapshot.isOn)
                     }) {
                         Image(systemName: "power")
                             .foregroundStyle(snapshot.isOn ? .green : .red)
-                            .help(snapshot.isOn ? "Power Off" : "Power Off (already off)")
+                            .help(snapshot.isOn ? "Power Off" : "Power On")
                     }
-                    .disabled(!snapshot.isOn)
                 }
                 .padding(.top, 6)
 
