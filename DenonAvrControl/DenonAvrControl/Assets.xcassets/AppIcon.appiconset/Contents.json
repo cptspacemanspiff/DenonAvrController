@@ -1,51 +1,61 @@
 {
   "images" : [
     {
+      "filename" : "logo_notext 3.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"
     },
     {
+      "filename" : "logo_notext 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "16x16"
     },
     {
+      "filename" : "logo_notext.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "32x32"
     },
     {
+      "filename" : "logo_notext 2.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
     {
+      "filename" : "dd9a21a5-d820-4646-bed6-8d6bad7a6d59 5.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "128x128"
     },
     {
+      "filename" : "dd9a21a5-d820-4646-bed6-8d6bad7a6d59 4.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
     },
     {
+      "filename" : "dd9a21a5-d820-4646-bed6-8d6bad7a6d59 3.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "256x256"
     },
     {
+      "filename" : "dd9a21a5-d820-4646-bed6-8d6bad7a6d59 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
+      "filename" : "dd9a21a5-d820-4646-bed6-8d6bad7a6d59 2.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
+      "filename" : "dd9a21a5-d820-4646-bed6-8d6bad7a6d59.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"
