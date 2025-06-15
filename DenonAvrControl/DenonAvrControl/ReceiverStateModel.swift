@@ -14,6 +14,10 @@ struct ReceiverStateSnapshot {
 }
 
 class ReceiverStateModel: ObservableObject {
+    // --- Source rename integration ---
+    @Published var availableSources: [String] = []
+    @Published var renameMap: [String: String] = [:]
+
     // --- Command sending methods ---
     /// Set the volume in dB (range: -80.5 to 18.0)
     func setVolume(to dB: Float) {
@@ -37,7 +41,7 @@ class ReceiverStateModel: ObservableObject {
     }
 
     /// Send a POST command to the receiver
-    private func sendPostCommand(cmd: String) {
+    func sendPostCommand(cmd: String) {
         print("[DenonAvr] sendPostCommand: \(cmd) to http://\(ipAddress)/MainZone/index.put.asp")
         guard !ipAddress.isEmpty else { return }
         let urlString = "http://\(ipAddress)/MainZone/index.put.asp"
@@ -62,6 +66,7 @@ class ReceiverStateModel: ObservableObject {
 
     /// Public method to trigger an immediate poll
     func performImmediatePoll() {
+        fetchSourceRenameMap()
         pollReceiver()
     }
 
@@ -75,11 +80,13 @@ class ReceiverStateModel: ObservableObject {
     init(ipAddress: String, pollingInterval: TimeInterval = 3.0) {
         self.ipAddress = ipAddress
         self.pollingInterval = pollingInterval
+        fetchSourceRenameMap()
     }
 
     func updateIPAddress(_ newIP: String) {
         ipAddress = newIP
         consecutiveFailures = 0 // Reset retries when a new IP is saved
+        fetchSourceRenameMap()
     }
 
     func startPolling() {
@@ -241,6 +248,47 @@ class ReceiverStateModel: ObservableObject {
             self.errorMessage = nil
             print("[Polling] Snapshot: isOn=\(snapshot.isOn), volume=\(snapshot.volume), isMuted=\(snapshot.isMuted), input=\(snapshot.input), lastUpdated=\(snapshot.lastUpdated)")
         }
+    }
+
+    // Fetch and parse the rename HTML from the AVR (run at startup or when IP changes)
+    func fetchSourceRenameMap() {
+        let urlString = "http://\(ipAddress)/SETUP/INPUTS/SOURCERENAME/d_Rename.asp"
+        print("[ReceiverStateModel] Fetching source rename map from: \(urlString)")
+        guard let url = URL(string: urlString) else {
+            print("[ReceiverStateModel] Invalid URL for source rename map: \(urlString)")
+            return
+        }
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+            guard let self = self else { return }
+            if let error = error {
+                print("[ReceiverStateModel] Error fetching rename HTML: \(error)")
+                return
+            }
+            guard let data = data, let html = String(data: data, encoding: .utf8) else {
+                print("[ReceiverStateModel] No data or invalid encoding for rename HTML")
+                return
+            }
+            print("[ReceiverStateModel] Fetched rename HTML length: \(html.count) characters")
+            let renameMap = SourceNameExtractor.extractRenameMappings(from: html)
+            let sources = Array(renameMap.keys).sorted()
+            print("[ReceiverStateModel] Parsed renameMap: \(renameMap)")
+            print("[ReceiverStateModel] Parsed availableSources: \(sources)")
+            DispatchQueue.main.async {
+                var updatedRenameMap = renameMap
+                var updatedSources = sources
+                // Ensure NET is always present with display name "Network"
+                if !updatedSources.contains("NET") {
+                    updatedSources.append("NET")
+                }
+                if updatedRenameMap["NET"] == nil {
+                    updatedRenameMap["NET"] = "Network"
+                }
+                self.renameMap = updatedRenameMap
+                self.availableSources = updatedSources.sorted()
+                print("[ReceiverStateModel] Available sources: \(self.availableSources)")
+                print("[ReceiverStateModel] Rename map: \(self.renameMap)")
+            }
+        }.resume()
     }
 
     // Helper to increment failure counter and stop polling if limit is reached

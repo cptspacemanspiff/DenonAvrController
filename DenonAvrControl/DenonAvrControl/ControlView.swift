@@ -55,7 +55,7 @@ struct ControlView: View {
             HStack {
                 Text("Volume:")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
                 Slider(
                     value: Binding(
                         get: { sliderValue },
@@ -96,13 +96,10 @@ struct ControlView: View {
             if let snapshot = receiverModel.lastPolledState {
                 HStack(alignment: .center, spacing: 0) {
                     HStack(alignment: .lastTextBaseline, spacing: 8) {
-                        Text("Input:")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Text(snapshot.input)
-                            .font(.subheadline.bold())
-                            .foregroundStyle(.primary)
-                            .lineLimit(1)
+                        SourcePickerInline(
+                            receiverModel: receiverModel,
+                            currentInput: snapshot.input
+                        )
                     }
                     .frame(width: 180, alignment: .leading)
                     Spacer()

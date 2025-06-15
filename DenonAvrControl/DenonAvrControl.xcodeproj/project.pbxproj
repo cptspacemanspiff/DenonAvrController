@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B232ABFF2DFDFA7500C4438E /* SWXMLHash in Frameworks */ = {isa = PBXBuildFile; productRef = B232ABFE2DFDFA7500C4438E /* SWXMLHash */; };
+		B23DE1B62DFE765300BBCDD4 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = B23DE1B52DFE765300BBCDD4 /* SwiftSoup */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B232ABFF2DFDFA7500C4438E /* SWXMLHash in Frameworks */,
+				B23DE1B62DFE765300BBCDD4 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +94,7 @@
 			name = DenonAvrControl;
 			packageProductDependencies = (
 				B232ABFE2DFDFA7500C4438E /* SWXMLHash */,
+				B23DE1B52DFE765300BBCDD4 /* SwiftSoup */,
 			);
 			productName = DenonAvrControl;
 			productReference = B2244D132DFDD5B300C96A5E /* DenonAvrControl.app */;
@@ -123,6 +126,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				B232ABFD2DFDFA7500C4438E /* XCRemoteSwiftPackageReference "SWXMLHash" */,
+				B23DE1B42DFE765300BBCDD4 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B2244D142DFDD5B300C96A5E /* Products */;
@@ -373,6 +377,14 @@
 				minimumVersion = 8.1.0;
 			};
 		};
+		B23DE1B42DFE765300BBCDD4 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.8;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -380,6 +392,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B232ABFD2DFDFA7500C4438E /* XCRemoteSwiftPackageReference "SWXMLHash" */;
 			productName = SWXMLHash;
+		};
+		B23DE1B52DFE765300BBCDD4 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B23DE1B42DFE765300BBCDD4 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -24,3 +24,13 @@ curl -X POST http://192.168.1.129/MainZone/index.put.asp -d "cmd0=PutZone_OnOff/
 
 # Power On
 curl -X POST http://192.168.1.129/MainZone/index.put.asp -d "cmd0=PutZone_OnOff/ON"
+
+
+# getting the availiable sources is harder:
+curl http://192.168.1.129/SETUP/INPUTS/SOURCEDELETE/d_Delete.asp
+
+curl http://192.168.1.129/SETUP/INPUTS/SOURCERENAME/d_Rename.asp   
+
+# set source name
+#
+curl -X POST http://192.168.1.129/MainZone/index.put.asp -d "cmd0=PutZone_InputFunction/NET"
