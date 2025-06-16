@@ -19,6 +19,11 @@ struct SettingsView: View {
     @State private var showSpinner: Bool = false
 
     var body: some View {
+        let _ = DispatchQueue.main.async {
+            if let window = NSApp.windows.first(where: { $0.isKeyWindow }) {
+                window.level = .floating
+            }
+        }
         VStack(alignment: .leading, spacing: 16) {
             Text("Receiver Settings")
                 .font(.title)
@@ -103,6 +108,7 @@ struct SettingsView: View {
         }
     }
 }
+
 
 #Preview {
     SettingsView(
