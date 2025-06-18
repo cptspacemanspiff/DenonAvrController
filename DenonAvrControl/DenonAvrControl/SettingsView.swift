@@ -19,6 +19,7 @@ struct SettingsView: View {
     @State private var localIsTesting: Bool = false
     @State private var showSpinner: Bool = false
 
+
     var body: some View {
         // Pause polling while settings window is active to avoid the
         // menu-bar window becoming key and hijacking keystrokes.
@@ -45,6 +46,8 @@ struct SettingsView: View {
                 Text("Error: \(error)")
                     .foregroundStyle(.red)
                     .font(.footnote)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             if let result = testResult.success {
                 if result {
@@ -57,6 +60,8 @@ struct SettingsView: View {
                 Text("Test failed: \(msg)")
                     .foregroundStyle(.red)
                     .font(.footnote)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             HStack(spacing: 12) {
                 Button(action: {
@@ -81,6 +86,7 @@ struct SettingsView: View {
                         .frame(width: 12, height: 12)
                 }
                 Spacer()
+
                 Button("Save") {
                     onSave()
                     if let window = NSApp.windows.first(where: { $0.isKeyWindow }) {
@@ -88,7 +94,6 @@ struct SettingsView: View {
                     }
                 }
                 .keyboardShortcut(.defaultAction)
-//                .disabled(!(testResult.success ?? false))
             }
         }
         .padding(32)
