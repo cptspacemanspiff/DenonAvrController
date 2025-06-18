@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AppKit
 
 @main
 struct DenonAvrControlApp: App {
@@ -15,7 +16,7 @@ struct DenonAvrControlApp: App {
     @State private var isTestingConnection: Bool = false
 
     @State private var plainTextBoxValue: String = "hello"
-    
+
     @State private var didPollOnLaunch = false
     var body: some Scene {
         MenuBarExtra("🔊 Volume", systemImage: "speaker.wave.2") {
