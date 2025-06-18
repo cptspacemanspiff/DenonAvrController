@@ -1,7 +1,7 @@
-import Foundation
 import Combine
-import SystemConfiguration
 import CoreFoundation
+import Foundation
+import SystemConfiguration
 
 import SWXMLHash
 
@@ -59,6 +59,7 @@ class ReceiverStateModel: ObservableObject {
         }
         task.resume()
     }
+
     // Published properties for UI binding
     @Published var lastPolledState: ReceiverStateSnapshot? = nil
     @Published var isConnected: Bool = false
@@ -122,20 +123,20 @@ class ReceiverStateModel: ObservableObject {
         guard let url = URL(string: urlString) else {
             print("[Polling] Invalid IP address: \(ipAddress)")
             DispatchQueue.main.async { self.errorMessage = "Invalid IP address" }
-            self.incrementFailureAndMaybeStop()
+            incrementFailureAndMaybeStop()
             return
         }
         print("[Polling] Attempting to poll receiver at \(ipAddress)...")
-        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
             guard let self = self else { return }
             if let error = error {
-                print("[Polling] Poll failed for \(self.ipAddress): \(error.localizedDescription) [Failure \(self.consecutiveFailures+1)/\(self.maxFailures)]")
+                print("[Polling] Poll failed for \(self.ipAddress): \(error.localizedDescription) [Failure \(self.consecutiveFailures + 1)/\(self.maxFailures)]")
                 DispatchQueue.main.async { self.errorMessage = error.localizedDescription }
                 self.incrementFailureAndMaybeStop()
                 return
             }
             guard let data = data else {
-                print("[Polling] No data received from receiver at \(self.ipAddress) [Failure \(self.consecutiveFailures+1)/\(self.maxFailures)]")
+                print("[Polling] No data received from receiver at \(self.ipAddress) [Failure \(self.consecutiveFailures + 1)/\(self.maxFailures)]")
                 DispatchQueue.main.async { self.errorMessage = "No data received" }
                 self.incrementFailureAndMaybeStop()
                 return
@@ -149,20 +150,20 @@ class ReceiverStateModel: ObservableObject {
     /// Attempts a one-time connection to the given IP and calls completion with the result (true, nil) on success, (false, error) on failure.
     func validateConnection(ip: String, completion: @escaping (Bool, String?) -> Void) {
         guard !ip.isEmpty else {
-            self.incrementFailureAndMaybeStop()
+            incrementFailureAndMaybeStop()
             completion(false, "IP address is empty")
             return
         }
         let urlString = "http://\(ip)/goform/formMainZone_MainZoneXml.xml"
         guard let url = URL(string: urlString) else {
-            self.incrementFailureAndMaybeStop()
+            incrementFailureAndMaybeStop()
             completion(false, "Invalid IP address")
             return
         }
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 3.0
         let session = URLSession(configuration: config)
-        let task = session.dataTask(with: url) { data, response, error in
+        let task = session.dataTask(with: url) { data, _, error in
             if let error = error {
                 self.incrementFailureAndMaybeStop()
                 completion(false, error.localizedDescription)
@@ -203,16 +204,18 @@ class ReceiverStateModel: ObservableObject {
         private var foundPower = false
         private var foundMasterVolume = false
         var onError: ((String) -> Void)?
-        func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
+        func parser(_: XMLParser, didStartElement elementName: String, namespaceURI _: String?, qualifiedName _: String?, attributes _: [String: String] = [:]) {
             if elementName == "item" { foundRoot = true }
             if elementName == "FriendlyName" { foundFriendlyName = true }
             if elementName == "Power" { foundPower = true }
             if elementName == "MasterVolume" { foundMasterVolume = true }
         }
-        func parser(_ parser: XMLParser, parseErrorOccurred parseError: Error) {
+
+        func parser(_: XMLParser, parseErrorOccurred parseError: Error) {
             onError?("XML parse error: \(parseError.localizedDescription)")
         }
-        func parserDidEndDocument(_ parser: XMLParser) {
+
+        func parserDidEndDocument(_: XMLParser) {
             isValid = foundRoot && foundFriendlyName && foundPower && foundMasterVolume
             if !isValid {
                 onError?("Missing required tags in receiver XML.")
@@ -222,9 +225,9 @@ class ReceiverStateModel: ObservableObject {
 
     private func parseReceiverXML(_ data: Data) {
         let xml = XMLHash.config {
-              config in
-              // set any config options here
-          }.parse(data)
+            _ in
+            // set any config options here
+        }.parse(data)
         let now = Date()
 
         let powerString = xml["item"]["Power"]["value"].element?.text ?? ""

@@ -12,18 +12,23 @@ struct SettingsView: View {
     var errorMessage: String?
     var onSave: () -> Void
     var onTest: ((String) -> Void)? = nil
-    var testResult: TestResult = TestResult(success: nil, message: nil)
+    var testResult: TestResult = .init(success: nil, message: nil)
     var isTesting: Bool = false
     var receiverModel: ReceiverStateModel
 
     @State private var localIsTesting: Bool = false
     @State private var showSpinner: Bool = false
-
+    @State private var plainTextBoxValue: String = ""
+    
     var body: some View {
         // Pause polling while settings window is active to avoid the
         // menu-bar window becoming key and hijacking keystrokes.
         // Resume polling once the window is closed again.
         VStack(alignment: .leading, spacing: 16) {
+            Text("Plain Text Box:")
+            TextEditor(text: $plainTextBoxValue)
+                .frame(height: 80)
+                .border(Color.gray.opacity(0.5))
             Text("Receiver Settings")
                 .font(.title)
                 .padding(.bottom, 8)
@@ -41,7 +46,6 @@ struct SettingsView: View {
                 .help("Open the receiver's web interface in your browser")
             }
 
-            
             if let error = errorMessage {
                 Text("Error: \(error)")
                     .foregroundStyle(.red)
@@ -99,7 +103,7 @@ struct SettingsView: View {
         }
         .onChange(of: isTesting) { newValue in
             localIsTesting = newValue
-            if (!newValue) { showSpinner = false }
+            if !newValue { showSpinner = false }
         }
         .onChange(of: ipAddress) { _ in
             localIsTesting = false
@@ -116,14 +120,14 @@ struct SettingsView: View {
     }
 }
 
-
 #Preview {
-    let 
     let mockModel = ReceiverStateModel(ipAddress: "192.168.1.100")
     SettingsView(
         ipAddress: .constant("192.168.1.100"),
-        errorMessage: nil,
-        onSave: {}
-        
+        onSave: {},
+        onTest: { _ in },
+        testResult: TestResult(success: nil, message: nil),
+        isTesting: false,
+        receiverModel: mockModel
     )
 }

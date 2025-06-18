@@ -12,6 +12,7 @@ struct SourcePickerInline: View {
         }
         return input
     }
+
     var body: some View {
         let mappedInput = reverseMappedKey(for: currentInput)
         // Ensure mappedInput is always in the Picker list (case-insensitive)
@@ -63,24 +64,23 @@ extension ReceiverStateModel {
     }
 }
 
-
 #if DEBUG
-struct SourcePickerInline_Previews: PreviewProvider {
-    class MockReceiverStateModel: ReceiverStateModel {
-        override init(ipAddress: String = "127.0.0.1", pollingInterval: TimeInterval = 3.0) {
-            super.init(ipAddress: ipAddress, pollingInterval: pollingInterval)
-            self.availableSources = ["PHONO", "MPLAY", "NET"]
-            self.renameMap = ["PHONO": "Vinyl", "MPLAY": "Spotify", "NET": "Network"]
+    struct SourcePickerInline_Previews: PreviewProvider {
+        class MockReceiverStateModel: ReceiverStateModel {
+            override init(ipAddress: String = "127.0.0.1", pollingInterval: TimeInterval = 3.0) {
+                super.init(ipAddress: ipAddress, pollingInterval: pollingInterval)
+                availableSources = ["PHONO", "MPLAY", "NET"]
+                renameMap = ["PHONO": "Vinyl", "MPLAY": "Spotify", "NET": "Network"]
+            }
+        }
+
+        static var previews: some View {
+            SourcePickerInline(
+                receiverModel: MockReceiverStateModel(),
+                currentInput: "PHONO"
+            )
+            .padding()
+            .previewLayout(.sizeThatFits)
         }
     }
-
-    static var previews: some View {
-        SourcePickerInline(
-            receiverModel: MockReceiverStateModel(),
-            currentInput: "PHONO"
-        )
-        .padding()
-        .previewLayout(.sizeThatFits)
-    }
-}
 #endif

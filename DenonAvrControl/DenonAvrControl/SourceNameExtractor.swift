@@ -8,7 +8,7 @@
 import Foundation
 import SwiftSoup
 
-public struct SourceNameExtractor {
+public enum SourceNameExtractor {
     /// Extracts all source names from a JavaScript string (e.g., from buttonFuncRenameSet).
     /// - Parameter js: The JavaScript code as a string.
     /// - Returns: An array of source names (e.g., ["BD", "DVD", "TV", ...])
@@ -17,7 +17,7 @@ public struct SourceNameExtractor {
         guard let regex = try? NSRegularExpression(pattern: pattern) else {
             return []
         }
-        let nsrange = NSRange(js.startIndex..<js.endIndex, in: js)
+        let nsrange = NSRange(js.startIndex ..< js.endIndex, in: js)
         let matches = regex.matches(in: js, range: nsrange)
         let names = matches.compactMap { match -> String? in
             guard let range = Range(match.range(at: 1), in: js) else { return nil }
