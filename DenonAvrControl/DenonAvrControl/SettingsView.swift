@@ -88,7 +88,7 @@ struct SettingsView: View {
                     }
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled(!(testResult.success ?? false))
+//                .disabled(!(testResult.success ?? false))
             }
         }
         .padding(32)
