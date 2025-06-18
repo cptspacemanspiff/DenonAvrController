@@ -62,6 +62,7 @@ struct SettingsView: View {
                 Button(action: {
                     localIsTesting = true
                     showSpinner = false
+                    print("[SettingsView] Test Connection pressed for IP: \(ipAddress) at \(Date())")
                     // Show spinner if still testing after 0.3s
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         if localIsTesting {
@@ -92,9 +93,10 @@ struct SettingsView: View {
         }
         .padding(32)
         .frame(minWidth: 300, minHeight: 200)
-        .onChange(of: testResult) { _ in
+        .onChange(of: testResult) { newResult in
             localIsTesting = false
             showSpinner = false
+            print("[SettingsView] Test result received: success=\(String(describing: newResult.success)), message=\(String(describing: newResult.message)) at \(Date())")
         }
         .onChange(of: isTesting) { newValue in
             localIsTesting = newValue
