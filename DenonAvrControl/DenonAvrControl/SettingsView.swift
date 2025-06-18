@@ -18,17 +18,12 @@ struct SettingsView: View {
 
     @State private var localIsTesting: Bool = false
     @State private var showSpinner: Bool = false
-    @State private var plainTextBoxValue: String = ""
-    
+
     var body: some View {
         // Pause polling while settings window is active to avoid the
         // menu-bar window becoming key and hijacking keystrokes.
         // Resume polling once the window is closed again.
         VStack(alignment: .leading, spacing: 16) {
-            Text("Plain Text Box:")
-            TextEditor(text: $plainTextBoxValue)
-                .frame(height: 80)
-                .border(Color.gray.opacity(0.5))
             Text("Receiver Settings")
                 .font(.title)
                 .padding(.bottom, 8)

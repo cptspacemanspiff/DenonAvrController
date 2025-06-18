@@ -58,6 +58,12 @@ struct DenonAvrControlApp: App {
                 )
                 FloatingWindowAccessor()
             }
+            .onAppear {
+                NSApp.setActivationPolicy(.regular)
+            }
+            .onDisappear {
+                NSApp.setActivationPolicy(.accessory)
+            }
         }
     }
 }
