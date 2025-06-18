@@ -35,7 +35,6 @@ struct DenonAvrControlApp: App {
         Window("Settings", id: "settings") {
             SettingsView(
                 ipAddress: $ipAddress,
-
                 onSave: {
                     UserDefaults.standard.set(ipAddress, forKey: "ReceiverIP")
                     receiverModel.updateIPAddress(ipAddress)
@@ -51,7 +50,8 @@ struct DenonAvrControlApp: App {
                     }
                 },
                 testResult: testResult,
-                isTesting: isTestingConnection
+                isTesting: isTestingConnection,
+                receiverModel: receiverModel,
             )
         }
     }

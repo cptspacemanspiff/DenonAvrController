@@ -90,11 +90,13 @@ class ReceiverStateModel: ObservableObject {
     }
 
     func startPolling() {
+        print("[Polling] startPolling() called — scheduling polling timer (interval: \(pollingInterval)s)")
         stopPolling()
         beginPolling() // Always restart polling timer when startPolling is called
     }
 
     private func beginPolling() {
+        print("[Polling] beginPolling() — starting recurring polling")
         stopPolling() // Prevent multiple timers!
         guard !isPollingActive else { return }
         isPollingActive = true
@@ -105,6 +107,7 @@ class ReceiverStateModel: ObservableObject {
     }
 
     func stopPolling() {
+        print("[Polling] stopPolling() called — cancelling polling timer")
         pollingTimer?.invalidate()
         pollingTimer = nil
         isPollingActive = false

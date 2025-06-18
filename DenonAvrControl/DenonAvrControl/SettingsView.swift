@@ -14,16 +14,15 @@ struct SettingsView: View {
     var onTest: ((String) -> Void)? = nil
     var testResult: TestResult = TestResult(success: nil, message: nil)
     var isTesting: Bool = false
+    var receiverModel: ReceiverStateModel
 
     @State private var localIsTesting: Bool = false
     @State private var showSpinner: Bool = false
 
     var body: some View {
-        let _ = DispatchQueue.main.async {
-            if let window = NSApp.windows.first(where: { $0.isKeyWindow }) {
-                window.level = .floating
-            }
-        }
+        // Pause polling while settings window is active to avoid the
+        // menu-bar window becoming key and hijacking keystrokes.
+        // Resume polling once the window is closed again.
         VStack(alignment: .leading, spacing: 16) {
             Text("Receiver Settings")
                 .font(.title)
@@ -106,14 +105,25 @@ struct SettingsView: View {
             localIsTesting = false
             showSpinner = false
         }
+        .onAppear {
+            // Pause polling so the menu-bar window doesn't steal focus while this window is active
+            receiverModel.stopPolling()
+        }
+        .onDisappear {
+            // Resume polling once the settings window closes
+            receiverModel.startPolling()
+        }
     }
 }
 
 
 #Preview {
+    let 
+    let mockModel = ReceiverStateModel(ipAddress: "192.168.1.100")
     SettingsView(
         ipAddress: .constant("192.168.1.100"),
         errorMessage: nil,
         onSave: {}
+        
     )
 }
