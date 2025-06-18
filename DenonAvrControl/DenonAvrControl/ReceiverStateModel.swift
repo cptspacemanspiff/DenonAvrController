@@ -258,8 +258,12 @@ class ReceiverStateModel: ObservableObject {
 
     // Fetch and parse the rename HTML from the AVR (run at startup or when IP changes)
     func fetchSourceRenameMap() {
+        guard !ipAddress.isEmpty else {
+            print("[FetchSourceRenameMap] Skipped: IP address is empty.")
+            return
+        }
         let urlString = "http://\(ipAddress)/SETUP/INPUTS/SOURCERENAME/d_Rename.asp"
-        print("[ReceiverStateModel] Fetching source rename map from: \(urlString)")
+        print("[FetchSourceRenameMap] Fetching source rename map from: \(urlString)")
         guard let url = URL(string: urlString) else {
             print("[ReceiverStateModel] Invalid URL for source rename map: \(urlString)")
             return
